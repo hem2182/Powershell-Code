@@ -27,6 +27,7 @@
             Write-Verbose "Emptying Output Directory"
             Remove-Item -Path $Output -Force -Recurse
             New-Item -Path $Output -ItemType Directory | Out-Null
+            New-Item -Path $Output -ItemType File -Name "ErrorLogs.txt"
         }
 
         $OutputFilesCount = [Math]::Ceiling((Get-ChildItem -Path $Source -Recurse -File).Count / $LineBreakupValue)
@@ -45,7 +46,8 @@
                     Add-Content -Path $Output\$Filename -Value $_.FullName -ErrorAction Stop
                 } 
                 catch {
-                     $_.Exception.Message | Out-File "$Output\ErrorLogs.txt" -Append -Force
+                    Write-Host "$($_.Exception.Message)" -ForegroundColor Red
+                    $_.Exception.Message | Out-File "$Output\ErrorLogs.txt" -Append -Force
                 }
                 
             }

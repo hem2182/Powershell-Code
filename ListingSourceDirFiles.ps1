@@ -35,16 +35,17 @@
     }
 
     Process {
+        $ErrorActionPreference = "Continue"
         For($i = 1; $i -le $OutputFilesCount; $i++) {
             $Filename = "Output_$i.txt"
             Write-Verbose "Creating File: $Filename"
             New-Item -Path $Output -Name $Filename -ItemType File | Out-Null
-            Get-ChildItem -Path $Source -Recurse -File | Select FullName -Skip ($i*$LineBreakupValue -$LineBreakupValue) -First $LineBreakupValue | Foreach 
-            {
+            Get-ChildItem -Path $Source -Recurse -File | Select FullName -Skip ($i*$LineBreakupValue -$LineBreakupValue) -First $LineBreakupValue | Foreach {
                 try {
-                    Add-Content -Path $Output\$Filename -Value $_.FullName
-                } catch {
-                    Write-Host $_
+                    Add-Content -Path $Output\$Filename -Value $_.FullName -ErrorAction Stop
+                } 
+                catch {
+                     $_.Exception.Message | Out-File "$Output\ErrorLogs.txt" -Append -Force
                 }
                 
             }
@@ -52,7 +53,9 @@
     }
 
     End {
+        Write-Output "Error Logs file created at path $Output\ErrorLogs.txt..."
         Write-Output "Task Complete..."
+
     }
 }
 

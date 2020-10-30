@@ -39,8 +39,14 @@
             $Filename = "Output_$i.txt"
             Write-Verbose "Creating File: $Filename"
             New-Item -Path $Output -Name $Filename -ItemType File | Out-Null
-            Get-ChildItem -Path $Source -Recurse -File | Select FullName -Skip ($i*$LineBreakupValue -$LineBreakupValue) -First $LineBreakupValue | Foreach {
-                Add-Content -Path $Output\$Filename -Value $_.FullName
+            Get-ChildItem -Path $Source -Recurse -File | Select FullName -Skip ($i*$LineBreakupValue -$LineBreakupValue) -First $LineBreakupValue | Foreach 
+            {
+                try {
+                    Add-Content -Path $Output\$Filename -Value $_.FullName
+                } catch {
+                    Write-Host $_
+                }
+                
             }
         }
     }
@@ -50,4 +56,4 @@
     }
 }
 
-List-Files -Source "E:\PersonalDocs" -Output "E:\Output" -LineBreakupValue 100
+List-Files -Source "E:\PersonalDocs" -Output "E:\Output" -LineBreakupValue 1000000
